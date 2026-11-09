@@ -1,13 +1,13 @@
 <template>
   <Transition name="pop">
-    <button v-if="show" class="top" aria-label="Back to top" @click="scrollTo('#main')">
+    <button v-if="show && !atFoot" class="top" aria-label="Back to top" @click="scrollTo('#main')">
       <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" pathLength="100" :stroke-dasharray="`${pct} 100`" transform="rotate(-90 18 18)" /></svg>
       <span>↑</span>
     </button>
   </Transition>
 </template>
 <script setup lang="ts">
-const show = ref(false), pct = ref(0), scrollTo = useScrollTo()
+const show = ref(false), pct = ref(0), atFoot = ref(false), scrollTo = useScrollTo()
 onMounted(() => {
   const f = () => {
     const max = document.documentElement.scrollHeight - innerHeight
@@ -15,7 +15,11 @@ onMounted(() => {
     show.value = scrollY > innerHeight * 0.6
   }
   addEventListener('scroll', f, { passive: true }); f()
-  onBeforeUnmount(() => removeEventListener('scroll', f))
+  // the footer has its own "Back to top", so step aside while it is on screen
+  const foot = document.querySelector('#contact')
+  const io = foot ? new IntersectionObserver(([e]) => { atFoot.value = e.isIntersecting }) : null
+  if (foot) io!.observe(foot)
+  onBeforeUnmount(() => { removeEventListener('scroll', f); io?.disconnect() })
 })
 </script>
 <style scoped>

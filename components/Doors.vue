@@ -313,16 +313,25 @@ html[data-mode="dark"] .dinfo{--dinfo-accent:#D9C6C6}
 .door-cursor.on{opacity:1}
 
 @media(max-width:639.98px){
-  .doors{padding-top:5.5rem;padding-bottom:0}
-  .doors__sub{margin-bottom:1rem;text-align:left;align-self:flex-start}.swipe{display:inline}
+  /* phone layout (as in the reference): heading, then the active door's notes, then the door row standing on a floor */
+  .doors{padding-top:5.5rem;padding-bottom:2.4rem}
+  .doors::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2.4rem;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 1px,rgba(0,0,0,.06) 2px,transparent 4px,transparent 7px,rgba(0,0,0,.05) 8px,rgba(255,255,255,.25) 9px,transparent 11px,rgba(0,0,0,.08) 100%),var(--base);
+    box-shadow:0 -1px 0 rgba(0,0,0,.07),0 -.5rem .9rem -.45rem rgba(0,0,0,.16)}
+  .doors.through::after{display:none}
+  .doors__sub{display:none}
+  .unit.on .door{transform:none;box-shadow:inset 0 0 0 .3cqi rgba(0,0,0,.28),inset .6cqi 0 0 rgba(255,255,255,.05)}
+  .unit.on .door__shade{opacity:0}
   .paint{font-size:2.15rem;text-align:left;align-self:flex-start;max-width:none}
-  .doors__row{display:flex;gap:1.5rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-inline:calc(50% - 28vw);margin-inline:-1.25rem;width:calc(100% + 2.5rem);padding-top:2rem;scrollbar-width:none;align-items:flex-end}
+  .doors__wall{gap:0}
+  .dinfo--m{order:1;position:relative;width:100%;max-width:100%;margin:1.4rem 0 0;padding-top:1.25rem;border-top:1px solid rgba(var(--fg-rgb),.1);opacity:1;transform:none;min-height:14rem}
+  .doors__dots{order:2;display:flex;gap:.4rem;margin:.4rem 0 .6rem;align-self:flex-start}
+  .doors__row{order:3;display:flex;gap:1.5rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-inline:29vw;margin-inline:-1.25rem;width:calc(100% + 2.5rem);padding-top:1rem;scrollbar-width:none;align-items:flex-end}
+  .doors__row::-webkit-scrollbar{display:none}
   .doors__row::after{display:none}
-  .unit{flex:0 0 56vw;max-width:none;scroll-snap-align:center}
+  .unit{flex:0 0 42vw;max-width:none;scroll-snap-align:center}
   .unit::before{display:none}
-  .dinfo--m{position:relative;width:100%;max-width:100%;margin:.9rem 0 0;padding-top:1rem;border-top:1px solid rgba(var(--fg-rgb),.1);opacity:1;transform:none;min-height:10.5rem}
   .dinfo__h{font-size:1.5rem}.dinfo__p{font-size:.875rem}
-  .doors__dots{display:flex;gap:.4rem;margin:.5rem 0 1.5rem}
   .doors__dots i{width:.4rem;height:.4rem;border-radius:999px;background:rgba(var(--fg-rgb),.2);transition:width .35s var(--e-soft),background .35s}
   .doors__dots i.on{width:1.3rem;background:var(--foreground)}
   .door-cursor{display:none}

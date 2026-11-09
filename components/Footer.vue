@@ -58,7 +58,6 @@ html[data-mode="dark"] .sf{--sf-bg:#0F0E0E;box-shadow:inset 0 1px 0 rgba(232,228
 .sf__btn b{display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;background:var(--sf-bg);color:var(--sf-fg)}
 .sf__btn svg{width:1.05rem;height:1.05rem;transition:transform .35s var(--e-soft)}.sf__btn:hover{transform:translateY(-2px)}.sf__btn:hover svg{transform:translateX(3px)}
 .sf__btn--plain{padding:0 1.6rem}
-@media(max-width:639.98px){.sf__cta>*{width:100%;justify-content:center}.sf__btn{justify-content:space-between}.sf__btn--plain{justify-content:center}}
 .sf__ghost{display:inline-flex;align-items:center;height:3.5rem;padding:0 1.5rem;border-radius:999px;border:1px solid rgba(var(--sf-rgb),.2);color:var(--sf-fg);font-size:1rem;font-weight:500;transition:background .25s}
 .sf__ghost:hover{background:rgba(var(--sf-rgb),.07)}
 .sf__cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.5rem 1.5rem;margin-top:4.5rem;padding-top:2.75rem;border-top:1px solid rgba(var(--sf-rgb),.12)}
