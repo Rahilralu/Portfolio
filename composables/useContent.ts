@@ -74,7 +74,7 @@ export const story = [
 ]
 
 export const doorInfo: Record<string, { tag: string; heading: string; bullets: string[]; glow: string; dk: string }> = {
-  frontend: { tag: 'Vue · Nuxt · React', heading: 'Interfaces that feel considered', glow: '120,160,230', dk: '#22304a', bullets: ['HR platform modules in Vue and Nuxt 3', 'Company and association websites in production', 'Pinia, TypeScript and Tailwind', 'Static builds that deploy to the edge'] },
+  frontend: { tag: 'Vue · Nuxt · React', heading: 'Interfaces that feel right', glow: '120,160,230', dk: '#22304a', bullets: ['HR platform modules in Vue and Nuxt 3', 'Company and association websites', 'Pinia, TypeScript and Tailwind', 'Static builds that deploy to the edge'] },
   backend: { tag: 'Node · ERPNext · Workers', heading: 'Backends that stay reliable', glow: '220,150,190', dk: '#4a3540', bullets: ['REST APIs, WebSockets and job queues', 'Payments with signed webhooks', 'ERPNext lead-to-cash workflows', 'Cloudflare Workers with D1'] },
   ai: { tag: 'LLMs · RAG · Graphs', heading: 'AI that checks its own work', glow: '170,190,150', dk: '#7a8670', bullets: ['Gemini classification pipelines', 'Hybrid vector + knowledge-graph RAG', 'Hallucination scoring and re-prompting', 'Local models via Ollama'] },
   uiux: { tag: 'Figma · Layouts · Systems', heading: 'Design that ships', glow: '255,190,120', dk: '#a4552c', bullets: ['Wireframes to mockups in Figma', 'Responsive layouts', 'Redesigns for live products', 'Design shapes how I build'] },

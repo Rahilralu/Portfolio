@@ -1,5 +1,5 @@
 <template>
-  <section id="works" ref="root" class="doors" :class="{ pre: !seen, in: seen, focus: hover !== null }">
+  <section id="works" ref="root" class="doors" :class="{ pre: !seen, in: seen, focus: hover !== null, compact }">
     <div class="doors__tex"></div>
     <div class="doors__pin">
       <div class="shell doors__wall" ref="wall">
@@ -29,7 +29,7 @@
             </li>
           </template>
         </ul>
-        <div v-if="mobile" class="dinfo dinfo--m on">
+        <div v-if="mobile" ref="dm" class="dinfo dinfo--m on">
           <h3 class="dinfo__h">{{ info[doors[cur].id].heading }}</h3>
           <p class="dinfo__t">{{ info[doors[cur].id].tag }}</p>
           <ul class="dinfo__p"><li v-for="b in info[doors[cur].id].bullets" :key="b">{{ b }}</li></ul>
@@ -47,6 +47,7 @@ const { openDoor, closeDoor, active, walking, req } = useDoor()
 const nuxt = useNuxtApp() as any
 const root = ref<HTMLElement>(), wall = ref<HTMLElement>(), row = ref<HTMLElement>(), dc = ref<HTMLElement>()
 const units = ref<HTMLElement[]>([])
+const compact = ref(false), dm = ref<HTMLElement>()
 const seen = ref(false), hover = ref<number | null>(null), pressed = ref(-1), opening = ref<string | null>(null), cur = ref(0), mobile = ref(false), busyUi = ref(false)
 const pos = reactive<Record<number, { left?: string; right?: string; top: string }>>({})
 function infoStyle(i: number) {
@@ -105,17 +106,14 @@ async function enterDoor(id: string) {
   if (i < 0 || busy) return
   busy = true; busyUi.value = true; hover.value = null
   const sec = root.value!
-  // 1. face the wall
-  const top = sec.getBoundingClientRect().top + scrollY
+  // 1. face the wall (on phones: the scroll position where this door is centred in the pinned wall)
+  if (mobile.value) { mForce = i; mApply() }
+  const top = mobile.value ? mobY(i) : sec.getBoundingClientRect().top + scrollY
   if (Math.abs(scrollY - top) > 4) {
     if (nuxt.$lenis) nuxt.$lenis.scrollTo(top, { duration: 0.9, easing: easeOut }); else scrollTo({ top, behavior: reduced() ? 'auto' : 'smooth' })
     await settle(top)
   }
-  if (mobile.value) {
-    const u = units.value[i]
-    row.value?.scrollTo({ left: u.offsetLeft - (row.value.clientWidth - u.offsetWidth) / 2, behavior: reduced() ? 'auto' : 'smooth' })
-    cur.value = i; await sleep(reduced() ? 0 : 520)
-  }
+  if (mobile.value) await sleep(reduced() ? 0 : 300)
   layout()
   // 2. lever down, then the door swings inward
   pressed.value = i; setTimeout(() => { if (pressed.value === i) pressed.value = -1 }, 380)
@@ -160,7 +158,7 @@ async function leaveRoom() {
   if (!inRoom || busy) return
   busy = true; busyUi.value = true; inRoom = false; walking.value = true; holdScroll(true)
   const sec = root.value!
-  if (instant) { instant = false; nuxt.$lenis ? nuxt.$lenis.scrollTo(sec.getBoundingClientRect().top + scrollY, { immediate: true, force: true }) : scrollTo(0, sec.getBoundingClientRect().top + scrollY) }
+  if (instant) { instant = false; const y = mobile.value ? mobY(cur.value) : sec.getBoundingClientRect().top + scrollY; nuxt.$lenis ? nuxt.$lenis.scrollTo(y, { immediate: true, force: true }) : scrollTo(0, y) }
   active.value = null // the room fades away over the dark
   await sleep(reduced() ? 0 : 880)
   cancelAnimationFrame(walkRaf)
@@ -176,6 +174,7 @@ async function leaveRoom() {
   })
   sec.style.transform = ''; sec.style.transformOrigin = ''; sec.classList.remove('through')
   opening.value = null // the door swings shut
+  mForce = -1; mApply()
   walking.value = false; holdScroll(false); busy = false; busyUi.value = false
   runPending()
 }
@@ -190,6 +189,79 @@ function dispatch(r: { kind: 'open' | 'leave'; id?: string }) {
   if (inRoom) { pending = r; return void leaveRoom() } // open another door from inside a room: back out first
   if (r.id) enterDoor(r.id)
 }
+
+// ---------------------------------------------------------------------------------------------
+// Phones: the wall stays pinned while you scroll. Each stretch of scrolling (or a sideways swipe) slides
+// one door into the middle and swaps the notes above it. `.doors` is 100svh + 3 x 55svh tall, `.doors__pin` sticks.
+// ---------------------------------------------------------------------------------------------
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
+const STEPS = doors.length - 1
+let mForce = -1, mCur = 0, mRaf = 0, mLast = 0, mSettle = 0, swipeLock = 0, touching = false
+const mSpan = () => Math.max(1, root.value!.offsetHeight - innerHeight)
+const mProg = () => clamp(-root.value!.getBoundingClientRect().top / mSpan(), 0, 1)
+const mobY = (i: number) => root.value!.getBoundingClientRect().top + scrollY + (clamp(i, 0, STEPS) / STEPS) * mSpan()
+// rest on each door, glide between them
+const mDwell = (f: number) => { const i = Math.floor(f), t = f - i, u = clamp((t - 0.2) / 0.6, 0, 1); return i + u * u * (3 - 2 * u) }
+const mTarget = () => (mForce >= 0 ? mForce : mDwell(mProg() * STEPS))
+function mFrame(now: number) {
+  mRaf = 0
+  const r = row.value
+  if (!r) return
+  if (!mobile.value || units.value.length < 2) { r.style.transform = ''; return }
+  const dt = Math.min(64, now - (mLast || now)); mLast = now
+  const t = mTarget()
+  mCur = reduced() ? t : mCur + (t - mCur) * Math.min(1, (dt / 1000) * 10)
+  mCur = clamp(mCur, t - 1, t + 1)
+  if (Math.abs(t - mCur) < 0.001) mCur = t
+  const step = units.value[1].offsetLeft - units.value[0].offsetLeft
+  r.style.transform = `translate3d(${(-mCur * step).toFixed(2)}px,0,0)`
+  cur.value = clamp(Math.round(t), 0, STEPS)
+  if (mCur !== t) mRaf = requestAnimationFrame(mFrame)
+}
+function mApply() { if (!mRaf) mRaf = requestAnimationFrame(mFrame) }
+// the door takes the height left under the text; on short screens the checklist steps aside for it
+async function mSize() {
+  const pin = root.value?.querySelector('.doors__pin') as HTMLElement | null, r = row.value
+  if (!pin || !r) return
+  if (!mobile.value) { pin.style.removeProperty('--uw'); compact.value = false; mApply(); return }
+  const fit = () => {
+    const pr = pin.getBoundingClientRect(), rr = r.getBoundingClientRect()
+    const avail = pr.bottom - parseFloat(getComputedStyle(pin).paddingBottom) - rr.top - parseFloat(getComputedStyle(r).paddingTop) - 2
+    return Math.min(innerWidth * 0.6, avail / 2.25)
+  }
+  compact.value = false; await nextTick()
+  let w = fit()
+  if (w < 140) { compact.value = true; await nextTick(); w = fit() }
+  pin.style.setProperty('--uw', Math.max(110, w).toFixed(1) + 'px')
+  mApply()
+}
+const snapTo = (top: number) => (nuxt.$lenis ? nuxt.$lenis.scrollTo(top, { duration: 0.6, easing: easeOut }) : scrollTo({ top, behavior: reduced() ? 'auto' : 'smooth' }))
+// when scrolling stops part-way between two doors, ease the page onto the nearest one
+function mFromScroll() {
+  if (!mobile.value || busy) return
+  mApply()
+  clearTimeout(mSettle)
+  mSettle = window.setTimeout(function settle() {
+    if (touching) { mSettle = window.setTimeout(settle, 120); return }
+    if (busy || inRoom || mForce >= 0 || performance.now() < swipeLock) return
+    const r = root.value!.getBoundingClientRect(); if (r.top > 0 || r.bottom < innerHeight) return // only while the wall is pinned
+    const want = mobY(Math.round(mProg() * STEPS))
+    if (Math.abs(scrollY - want) > 2) snapTo(want)
+  }, 220)
+}
+let tx0 = 0, ty0 = 0, i0 = 0
+const onTouchStart = (e: TouchEvent) => { touching = true; tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; i0 = Math.round(mProg() * STEPS) }
+const onTouchEnd = (e: TouchEvent) => {
+  touching = false
+  if (!mobile.value || busy || inRoom || mForce >= 0) return
+  const dx = e.changedTouches[0].clientX - tx0, dy = e.changedTouches[0].clientY - ty0
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return
+  swipeLock = performance.now() + 700 // a sideways swipe steps exactly one door
+  snapTo(mobY(i0 + (dx < 0 ? 1 : -1)))
+}
+// the notes cross-fade when the door changes
+watch(cur, () => { if (mobile.value && !reduced()) dm.value?.animate([{ opacity: 0, transform: 'translateY(.4rem)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)' }) })
+
 watch(req, (r) => { if (r) dispatch({ kind: r.kind, id: r.id }) })
 
 // URL <-> room. The page is the same for `/` and `/<room>`; the URL follows the open room, and back/forward drives it.
@@ -212,13 +284,19 @@ let instant = false
 function openAtOnce(id: string) {
   const i = doors.findIndex((d) => d.id === id); if (i < 0) return
   instant = true; inRoom = true; opening.value = id; cur.value = i
+  if (mobile.value) { mForce = i; mApply() }
   holdScroll(true); active.value = id
 }
 
 onMounted(() => {
   layout(); addEventListener('resize', layout)
+  const onResize = () => { mSize(); mFromScroll() }
+  mSize(); document.fonts?.ready.then(mSize); mCur = mTarget(); mApply()
+  addEventListener('resize', onResize); addEventListener('scroll', mFromScroll, { passive: true })
+  root.value?.addEventListener('touchstart', onTouchStart, { passive: true }); addEventListener('touchend', onTouchEnd, { passive: true })
+  onBeforeUnmount(() => { removeEventListener('resize', onResize); removeEventListener('scroll', mFromScroll); removeEventListener('touchend', onTouchEnd); cancelAnimationFrame(mRaf); clearTimeout(mSettle) })
   const first = roomOfRoute(); if (first && route.name === 'room') openAtOnce(first)
-  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { seen.value = true; io.disconnect(); setTimeout(layout, 1400) } }, { threshold: 0.18 })
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { seen.value = true; io.disconnect(); setTimeout(layout, 1400) } }, { threshold: innerWidth < 640 ? 0.04 : 0.18 })
   root.value && io.observe(root.value)
   onBeforeUnmount(() => { io.disconnect(); removeEventListener('resize', layout); cancelAnimationFrame(walkRaf); if (busy || inRoom) holdScroll(false) })
 })
@@ -313,27 +391,32 @@ html[data-mode="dark"] .dinfo{--dinfo-accent:#D9C6C6}
 .door-cursor.on{opacity:1}
 
 @media(max-width:639.98px){
-  /* phone layout (as in the reference): heading, then the active door's notes, then the door row standing on a floor */
-  .doors{padding-top:5.5rem;padding-bottom:2.4rem}
-  .doors::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2.4rem;z-index:1;pointer-events:none;
+  /* phone layout: the wall pins while you scroll through it; the row is moved by Doors.vue (translate3d) */
+  .doors{padding-top:0;overflow:clip;height:calc(100svh + 3 * 55svh)}
+  .doors.through{overflow:clip}
+  .doors__pin{--uw:min(56vw,calc((100svh - 31rem) / 2.25));--ug:calc(50vw - var(--uw) / 2 + .75rem);position:sticky;top:0;height:100svh;padding-top:4.75rem;padding-bottom:3.25rem;display:flex;flex-direction:column;justify-content:flex-start;overflow:clip}
+  .doors__pin::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3.25rem;z-index:1;pointer-events:none;
     background:linear-gradient(180deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 1px,rgba(0,0,0,.06) 2px,transparent 4px,transparent 7px,rgba(0,0,0,.05) 8px,rgba(255,255,255,.25) 9px,transparent 11px,rgba(0,0,0,.08) 100%),var(--base);
     box-shadow:0 -1px 0 rgba(0,0,0,.07),0 -.5rem .9rem -.45rem rgba(0,0,0,.16)}
-  .doors.through::after{display:none}
   .doors__sub{display:none}
-  .unit.on .door{transform:none;box-shadow:inset 0 0 0 .3cqi rgba(0,0,0,.28),inset .6cqi 0 0 rgba(255,255,255,.05)}
-  .unit.on .door__shade{opacity:0}
-  .paint{font-size:2.15rem;text-align:left;align-self:flex-start;max-width:none}
-  .doors__wall{gap:0}
-  .dinfo--m{order:1;position:relative;width:100%;max-width:100%;margin:1.4rem 0 0;padding-top:1.25rem;border-top:1px solid rgba(var(--fg-rgb),.1);opacity:1;transform:none;min-height:14rem}
-  .doors__dots{order:2;display:flex;gap:.4rem;margin:.4rem 0 .6rem;align-self:flex-start}
-  .doors__row{order:3;display:flex;gap:1.5rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-inline:29vw;margin-inline:-1.25rem;width:calc(100% + 2.5rem);padding-top:1rem;scrollbar-width:none;align-items:flex-end}
-  .doors__row::-webkit-scrollbar{display:none}
-  .doors__row::after{display:none}
-  .unit{flex:0 0 42vw;max-width:none;scroll-snap-align:center}
-  .unit::before{display:none}
-  .dinfo__h{font-size:1.5rem}.dinfo__p{font-size:.875rem}
+  .doors__wall{gap:1rem;align-items:stretch}
+  .paint{font-size:2.15rem;text-align:left;align-self:flex-start;max-width:none;margin:.25rem 0 .5rem}
+  .dinfo--m{order:1;position:relative;width:100%;max-width:100%;margin:.9rem 0 0;padding-top:1rem;border-top:1px solid rgba(var(--fg-rgb),.1);text-align:left;opacity:1;transform:none;min-height:10.5rem}
+  .dinfo--m .dinfo__h{font-size:1.5rem;line-height:1.1;margin-bottom:.35rem}
+  .dinfo--m .dinfo__t{margin-bottom:.85rem;font-size:.625rem;letter-spacing:.08em;line-height:1.4}
+  .dinfo--m .dinfo__p{font-size:.875rem;line-height:1.35;gap:.45rem}
+  .dinfo--m .dinfo__p li{gap:.6rem}
+  .doors.compact .dinfo__p{display:none}
+  .doors.compact .dinfo--m{min-height:0}
+  .doors__dots{order:2;display:flex;gap:.4rem;margin:.25rem 0 0}
   .doors__dots i{width:.4rem;height:.4rem;border-radius:999px;background:rgba(var(--fg-rgb),.2);transition:width .35s var(--e-soft),background .35s}
   .doors__dots i.on{width:1.3rem;background:var(--foreground)}
+  .doors__row{order:3;display:flex;gap:var(--ug);overflow:visible;padding-inline:calc(50% - var(--uw) / 2);margin-inline:-1.25rem;width:calc(100% + 2.5rem);padding-top:2rem;margin-top:-1rem;will-change:transform;align-items:flex-end}
+  .doors__row::after{display:none}
+  .unit{flex:0 0 var(--uw);max-width:none}
+  .unit::before{display:none}
+  .unit.on .door{transform:none;box-shadow:inset 0 0 0 .3cqi rgba(0,0,0,.28),inset .6cqi 0 0 rgba(255,255,255,.05)}
+  .unit.on .door__shade{opacity:0}
   .door-cursor{display:none}
 }
 @media(prefers-reduced-motion:reduce){.door,.casing,.room::after{transition:none}}
