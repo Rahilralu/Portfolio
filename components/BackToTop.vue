@@ -1,13 +1,13 @@
 <template>
   <Transition name="pop">
-    <button v-if="show && !atFoot" class="top" aria-label="Back to top" @click="scrollTo('#main')">
+    <button v-if="show && !atFoot && !onWall" class="top" aria-label="Back to top" @click="scrollTo('#main')">
       <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" pathLength="100" :stroke-dasharray="`${pct} 100`" transform="rotate(-90 18 18)" /></svg>
       <span>↑</span>
     </button>
   </Transition>
 </template>
 <script setup lang="ts">
-const show = ref(false), pct = ref(0), atFoot = ref(false), scrollTo = useScrollTo()
+const show = ref(false), pct = ref(0), atFoot = ref(false), onWall = ref(false), scrollTo = useScrollTo()
 onMounted(() => {
   const f = () => {
     const max = document.documentElement.scrollHeight - innerHeight
@@ -19,7 +19,11 @@ onMounted(() => {
   const foot = document.querySelector('#contact')
   const io = foot ? new IntersectionObserver(([e]) => { atFoot.value = e.isIntersecting }) : null
   if (foot) io!.observe(foot)
-  onBeforeUnmount(() => { removeEventListener('scroll', f); io?.disconnect() })
+  // on phones the pinned door wall fills the screen, so keep the button off it
+  const wall = document.querySelector('.doors')
+  const io2 = wall ? new IntersectionObserver(([e]) => { onWall.value = e.isIntersecting && innerWidth < 640 }, { threshold: 0.12 }) : null
+  if (wall) io2!.observe(wall)
+  onBeforeUnmount(() => { removeEventListener('scroll', f); io?.disconnect(); io2?.disconnect() })
 })
 </script>
 <style scoped>

@@ -16,7 +16,7 @@
         <div class="rv ctas" style="--d:560ms">
           <button class="pill pill--arrow pill--dark" @click="openContact()"><span class="pill__in">Hire me <span class="pill__badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></span></button>
           <a class="pill pill--outline" href="#works" @click.prevent="scrollTo('#works', -10)"><span class="pill__in">See my work</span></a>
-          <a class="pill pill--outline" href="/Muhammed_Rahil_Nazar_Resume.pdf" download><span class="pill__in">Resume</span></a>
+          <a class="pill pill--outline ctas__cv" href="/Muhammed_Rahil_Nazar_Resume.pdf" download><span class="pill__in">Resume</span></a>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@ body.ready .fig{opacity:1;transform:translate(-50%,0)}
 .soft{color:rgba(var(--fg-rgb),.5)}
 .cal-line{display:block;padding-top:.34em;margin-top:.1em;padding-bottom:.42em;pointer-events:auto}
 .ctas{display:flex;flex-wrap:wrap;gap:.75rem}
-@media(max-width:639.98px){.ctas{gap:.5rem}.ctas :deep(.pill__in){padding-inline:1.1rem}.ctas :deep(.pill--arrow .pill__in){padding:.375rem .375rem .375rem 1.1rem}}
+@media(max-width:639.98px){.ctas__cv{display:none}.ctas{gap:.5rem}.ctas :deep(.pill__in){padding-inline:1.1rem}.ctas :deep(.pill--arrow .pill__in){padding:.375rem .375rem .375rem 1.1rem}}
 .hero__bar{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:.75rem;height:var(--bar-h);border-top:1px solid rgba(var(--fg-rgb),.1);font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.025em;color:rgba(var(--fg-rgb),.72);max-width:none;padding-inline:max(1.25rem,calc((100vw - var(--shell))/2 + var(--gut)))}
 .mid{display:none}@media(min-width:640px){.mid{display:inline}}
 .scroll{display:inline-flex;align-items:center;gap:.5rem}
