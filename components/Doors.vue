@@ -192,16 +192,18 @@ function dispatch(r: { kind: 'open' | 'leave'; id?: string }) {
 
 // ---------------------------------------------------------------------------------------------
 // Phones: the wall stays pinned while you scroll. Each stretch of scrolling (or a sideways swipe) slides
-// one door into the middle and swaps the notes above it. `.doors` is 100svh + 3 x 55svh tall, `.doors__pin` sticks.
+// one door into the middle and swaps the notes above it. `.doors` is 100svh + 3 x 70svh tall, `.doors__pin` sticks.
 // ---------------------------------------------------------------------------------------------
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const STEPS = doors.length - 1
-let mForce = -1, mCur = 0, mRaf = 0, mLast = 0, mSettle = 0, swipeLock = 0, touching = false
+let mForce = -1, mCur = 0, mV = 0, mStep = 0, mRaf = 0, mLast = 0, mSettle = 0, swipeLock = 0, touching = false
+let lastSY = 0, lastST = 0, gestF = 0 // scroll gesture bookkeeping for the snap
+const hasScrollEnd = typeof window !== 'undefined' && 'onscrollend' in window
 const mSpan = () => Math.max(1, root.value!.offsetHeight - innerHeight)
 const mProg = () => clamp(-root.value!.getBoundingClientRect().top / mSpan(), 0, 1)
 const mobY = (i: number) => root.value!.getBoundingClientRect().top + scrollY + (clamp(i, 0, STEPS) / STEPS) * mSpan()
 // rest on each door, glide between them
-const mDwell = (f: number) => { const i = Math.floor(f), t = f - i, u = clamp((t - 0.2) / 0.6, 0, 1); return i + u * u * (3 - 2 * u) }
+const mDwell = (f: number) => { const i = Math.floor(f), t = f - i, u = clamp((t - 0.1) / 0.8, 0, 1); return i + u * u * (3 - 2 * u) }
 const mTarget = () => (mForce >= 0 ? mForce : mDwell(mProg() * STEPS))
 function mFrame(now: number) {
   mRaf = 0
@@ -210,20 +212,28 @@ function mFrame(now: number) {
   if (!mobile.value || units.value.length < 2) { r.style.transform = ''; return }
   const dt = Math.min(64, now - (mLast || now)); mLast = now
   const t = mTarget()
-  mCur = reduced() ? t : mCur + (t - mCur) * Math.min(1, (dt / 1000) * 10)
-  mCur = clamp(mCur, t - 1, t + 1)
-  if (Math.abs(t - mCur) < 0.001) mCur = t
-  const step = units.value[1].offsetLeft - units.value[0].offsetLeft
-  r.style.transform = `translate3d(${(-mCur * step).toFixed(2)}px,0,0)`
+  if (reduced()) { mCur = t; mV = 0 } else {
+    // critically damped spring with a speed limit: fast scrolling glides, never lurches
+    const k = 120, c = 2 * Math.sqrt(k)
+    for (let left = dt / 1000; left > 0; left -= 1 / 120) {
+      const h = Math.min(left, 1 / 120)
+      mV += ((t - mCur) * k - mV * c) * h
+      mV = clamp(mV, -4.5, 4.5)
+      mCur += mV * h
+    }
+    if (Math.abs(t - mCur) < 0.0015 && Math.abs(mV) < 0.01) { mCur = t; mV = 0 }
+  }
+  if (!mStep) mStep = units.value[1].offsetLeft - units.value[0].offsetLeft
+  r.style.transform = `translate3d(${(-mCur * mStep).toFixed(2)}px,0,0)`
   cur.value = clamp(Math.round(t), 0, STEPS)
-  if (mCur !== t) mRaf = requestAnimationFrame(mFrame)
+  if (mCur !== t || mV !== 0) mRaf = requestAnimationFrame(mFrame)
 }
 function mApply() { if (!mRaf) mRaf = requestAnimationFrame(mFrame) }
 // the door takes the height left under the text; on short screens the checklist steps aside for it
 async function mSize() {
   const pin = root.value?.querySelector('.doors__pin') as HTMLElement | null, r = row.value
   if (!pin || !r) return
-  if (!mobile.value) { pin.style.removeProperty('--uw'); compact.value = false; mApply(); return }
+  if (!mobile.value) { pin.style.removeProperty('--uw'); compact.value = false; mStep = 0; mApply(); return }
   const fit = () => {
     const pr = pin.getBoundingClientRect(), rr = r.getBoundingClientRect()
     const avail = pr.bottom - parseFloat(getComputedStyle(pin).paddingBottom) - rr.top - parseFloat(getComputedStyle(r).paddingTop) - 2
@@ -233,31 +243,45 @@ async function mSize() {
   let w = fit()
   if (w < 140) { compact.value = true; await nextTick(); w = fit() }
   pin.style.setProperty('--uw', Math.max(110, w).toFixed(1) + 'px')
+  mStep = units.value.length > 1 ? units.value[1].offsetLeft - units.value[0].offsetLeft : 0
   mApply()
 }
-const snapTo = (top: number) => (nuxt.$lenis ? nuxt.$lenis.scrollTo(top, { duration: 0.6, easing: easeOut }) : scrollTo({ top, behavior: reduced() ? 'auto' : 'smooth' }))
+const snapTo = (top: number) => (nuxt.$lenis ? nuxt.$lenis.scrollTo(top, { duration: clamp(0.35 + (Math.abs(top - scrollY) / innerHeight) * 0.5, 0.35, 0.8), easing: easeOut }) : scrollTo({ top, behavior: reduced() ? 'auto' : 'smooth' }))
+// when scrolling stops part-way between two doors, ease the page onto the nearest one
+function mSnapSettle() {
+  if (!mobile.value || busy || inRoom || mForce >= 0 || performance.now() < swipeLock) return
+  if (touching) { if (!hasScrollEnd) mSettle = window.setTimeout(mSnapSettle, 120); return }
+  const r = root.value!.getBoundingClientRect(); if (r.top > 0 || r.bottom < innerHeight) return // only while the wall is pinned
+  // a flick carries on to the next door in its direction; a small nudge falls back
+  const f = mProg() * STEPS, d = f - gestF, fl = Math.floor(f), fr = f - fl
+  const to = d > 0.04 ? (fr > 0.25 ? fl + 1 : fl) : d < -0.04 ? (fr < 0.75 ? fl : fl + 1) : Math.round(f)
+  const want = mobY(to)
+  if (Math.abs(scrollY - want) > 2) snapTo(want)
+}
+// scrollend can fire between bursts of scrolling; give a new scroll event 140ms to cancel the snap
+const onScrollEnd = () => { clearTimeout(mSettle); mSettle = window.setTimeout(mSnapSettle, 140) }
 // when scrolling stops part-way between two doors, ease the page onto the nearest one
 function mFromScroll() {
   if (!mobile.value || busy) return
   mApply()
+  const now = performance.now()
+  if (now - lastST > 250 && !touching) gestF = mProg() * STEPS // a new gesture starts here
+  lastSY = scrollY; lastST = now
   clearTimeout(mSettle)
-  mSettle = window.setTimeout(function settle() {
-    if (touching) { mSettle = window.setTimeout(settle, 120); return }
-    if (busy || inRoom || mForce >= 0 || performance.now() < swipeLock) return
-    const r = root.value!.getBoundingClientRect(); if (r.top > 0 || r.bottom < innerHeight) return // only while the wall is pinned
-    const want = mobY(Math.round(mProg() * STEPS))
-    if (Math.abs(scrollY - want) > 2) snapTo(want)
-  }, 220)
+  // never fight momentum: wait for the browser's scrollend where it exists, otherwise for a quiet gap
+  if (!hasScrollEnd) mSettle = window.setTimeout(mSnapSettle, 180)
 }
-let tx0 = 0, ty0 = 0, i0 = 0
-const onTouchStart = (e: TouchEvent) => { touching = true; tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; i0 = Math.round(mProg() * STEPS) }
+let tx0 = 0, ty0 = 0
+const onTouchStart = (e: TouchEvent) => { touching = true; tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY; gestF = mProg() * STEPS }
 const onTouchEnd = (e: TouchEvent) => {
   touching = false
   if (!mobile.value || busy || inRoom || mForce >= 0) return
+  if (!hasScrollEnd) { clearTimeout(mSettle); mSettle = window.setTimeout(mSnapSettle, 180) }
   const dx = e.changedTouches[0].clientX - tx0, dy = e.changedTouches[0].clientY - ty0
   if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return
   swipeLock = performance.now() + 700 // a sideways swipe steps exactly one door
-  snapTo(mobY(i0 + (dx < 0 ? 1 : -1)))
+  clearTimeout(mSettle)
+  snapTo(mobY(Math.round(mProg() * STEPS) + (dx < 0 ? 1 : -1)))
 }
 // the notes cross-fade when the door changes
 watch(cur, () => { if (mobile.value && !reduced()) dm.value?.animate([{ opacity: 0, transform: 'translateY(.4rem)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)' }) })
@@ -292,9 +316,9 @@ onMounted(() => {
   layout(); addEventListener('resize', layout)
   const onResize = () => { mSize(); mFromScroll() }
   mSize(); document.fonts?.ready.then(mSize); mCur = mTarget(); mApply()
-  addEventListener('resize', onResize); addEventListener('scroll', mFromScroll, { passive: true })
+  addEventListener('resize', onResize); addEventListener('scroll', mFromScroll, { passive: true }); if (hasScrollEnd) addEventListener('scrollend', onScrollEnd)
   root.value?.addEventListener('touchstart', onTouchStart, { passive: true }); addEventListener('touchend', onTouchEnd, { passive: true })
-  onBeforeUnmount(() => { removeEventListener('resize', onResize); removeEventListener('scroll', mFromScroll); removeEventListener('touchend', onTouchEnd); cancelAnimationFrame(mRaf); clearTimeout(mSettle) })
+  onBeforeUnmount(() => { removeEventListener('resize', onResize); removeEventListener('scroll', mFromScroll); removeEventListener('scrollend', onScrollEnd); removeEventListener('touchend', onTouchEnd); cancelAnimationFrame(mRaf); clearTimeout(mSettle) })
   const first = roomOfRoute(); if (first && route.name === 'room') openAtOnce(first)
   const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { seen.value = true; io.disconnect(); setTimeout(layout, 1400) } }, { threshold: innerWidth < 640 ? 0.04 : 0.18 })
   root.value && io.observe(root.value)
@@ -392,9 +416,9 @@ html[data-mode="dark"] .dinfo{--dinfo-accent:#D9C6C6}
 
 @media(max-width:639.98px){
   /* phone layout: the wall pins while you scroll through it; the row is moved by Doors.vue (translate3d) */
-  .doors{padding-top:0;overflow:clip;height:calc(100svh + 3 * 55svh)}
+  .doors{padding-top:0;overflow:clip;height:calc(100svh + 3 * 70svh)}
   .doors.through{overflow:clip}
-  .doors__pin{--uw:min(56vw,calc((100svh - 31rem) / 2.25));--ug:calc(50vw - var(--uw) / 2 + .75rem);position:sticky;top:0;height:100svh;padding-top:4.75rem;padding-bottom:3.25rem;display:flex;flex-direction:column;justify-content:flex-start;overflow:clip}
+  .doors__pin{--uw:min(56vw,calc((100svh - 31rem) / 2.25));--ug:calc(50vw - var(--uw) / 2 + .75rem);position:sticky;top:0;height:100svh;touch-action:pan-y;padding-top:4.75rem;padding-bottom:3.25rem;display:flex;flex-direction:column;justify-content:flex-start;overflow:clip}
   .doors__pin::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3.25rem;z-index:1;pointer-events:none;
     background:linear-gradient(180deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 1px,rgba(0,0,0,.06) 2px,transparent 4px,transparent 7px,rgba(0,0,0,.05) 8px,rgba(255,255,255,.25) 9px,transparent 11px,rgba(0,0,0,.08) 100%),var(--base);
     box-shadow:0 -1px 0 rgba(0,0,0,.07),0 -.5rem .9rem -.45rem rgba(0,0,0,.16)}

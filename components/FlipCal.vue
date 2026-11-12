@@ -1,5 +1,5 @@
 <template>
-  <span class="cal rv" style="--d:450ms;--from:translateY(.5em);--ease:var(--e-soft)" role="text" :aria-label="words[idx]">
+  <span ref="root" class="cal rv" :style="{ '--d': '450ms', '--from': 'translateY(.5em)', '--ease': 'var(--e-soft)', '--fit': fit }" role="text" :aria-label="words[idx]">
     <span class="cal__body" :style="{ width: w }">
       <span class="cal__stand"></span>
       <span class="cal__card">
@@ -29,8 +29,25 @@ const widthEm = (i: number) => {
   const fs = parseFloat(getComputedStyle(el.parentElement as HTMLElement).fontSize) || 16
   return el.offsetWidth / fs + 0.95
 }
+// phones: shrink the whole card so the widest word always fits the line (desktop stays at 1)
+const root = ref<HTMLElement | null>(null)
+const fit = ref(1)
+const fitCard = () => {
+  const el = root.value, line = el?.parentElement
+  if (!el || !line) return
+  if (innerWidth >= 640) { fit.value = 1; return }
+  const widest = Math.max(...props.words.map((_, i) => widthEm(i)))
+  const base = (parseFloat(getComputedStyle(line).fontSize) || 16) * 0.9
+  fit.value = Math.max(0.6, Math.min(1, (line.clientWidth - 2) / (widest * base)))
+}
 onMounted(() => {
+  const refit = () => { fitCard(); w.value = widthEm(idx.value) + 'em' }
   w.value = widthEm(0) + 'em'
+  fitCard()
+  // the web font may land after the first measure: measure again once it has
+  document.fonts?.ready.then(refit)
+  addEventListener('resize', refit)
+  onBeforeUnmount(() => removeEventListener('resize', refit))
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
   const id = setInterval(() => {
     next.value = (idx.value + 1) % props.words.length
@@ -43,7 +60,7 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-.cal{position:relative;display:inline-block;font-size:.9em;vertical-align:top}
+.cal{position:relative;display:inline-block;font-size:calc(.9em * var(--fit,1));max-width:100%;vertical-align:top}
 .cal.rv{transition-duration:1.1s}
 .cal__body{position:relative;display:block;height:1.72em;transition:width .55s var(--e-soft)}
 .cal__stand{position:absolute;left:.1em;right:.1em;top:.3em;bottom:-.3em;border-radius:.26em;background:linear-gradient(165deg,#3a3a3a 0%,#141414 40%,#050505 100%);box-shadow:0 .5em .9em -.35em rgba(0,0,0,.55),inset 0 .02em 0 rgba(255,255,255,.12)}

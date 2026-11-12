@@ -70,6 +70,8 @@ body.ready .line>span{transform:none;opacity:1}
 .pill--dark .pill__in{background:var(--btn-bg);color:var(--btn-fg)}
 .pill--outline .pill__in{border:1px solid var(--line);background:transparent;color:var(--foreground)}
 .pill--outline:hover .pill__in{background:var(--outline-h)}
+.pill--white .pill__in{border:1px solid rgba(26,24,24,.12);background:#fff;color:#1a1818}
+.pill--white:hover .pill__in{background:#f4f1ee}
 .pill__badge{width:2.25rem;height:2.25rem;display:grid;place-items:center;border-radius:9999px;font-size:1rem;background:var(--btn-badge-bg);color:var(--btn-badge-fg)}
 .chip{border:1px solid var(--chip-line);background:var(--chip-bg);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);border-radius:var(--radius-control)}
 @media(prefers-reduced-motion:reduce){.rv,.line>span{transition:none;opacity:1;transform:none}*{animation:none!important}}

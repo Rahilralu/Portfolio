@@ -11,7 +11,7 @@
   <Footer />
 </template>
 <script setup lang="ts">
-useHead({ title: 'Privacy & credits — Muhammed Rahil Nazar' })
+useSeo(() => ({ path: '/legal', title: 'Privacy & credits | Muhammed Rahil Nazar', description: 'Privacy notice and credits for the portfolio of Muhammed Rahil Nazar.' }))
 </script>
 <style scoped>
 .legal{padding-top:9rem;padding-bottom:8rem;max-width:52rem}

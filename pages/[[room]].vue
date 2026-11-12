@@ -18,7 +18,7 @@ definePageMeta({
 })
 const route = useRoute()
 const room = computed(() => doors.find((d) => d.path === route.params.room))
-useHead(() => ({
-  title: room.value ? `${room.value.plate.replace('\n', ' ')} — Muhammed Rahil Nazar` : 'Muhammed Rahil Nazar — Full Stack Developer',
-}))
+useSeo(() => room.value
+  ? { path: `/${room.value.path}`, title: `${room.value.plate.replace('\n', ' ')} | Muhammed Rahil Nazar`, description: `${room.value.blurb} Selected work by Muhammed Rahil Nazar, full stack developer in Kochi, India.` }
+  : { path: '/', title: 'Muhammed Rahil Nazar | Full Stack Developer, Kochi' })
 </script>

@@ -3,7 +3,7 @@
     <div class="story__amb" aria-hidden="true"><i v-for="n in story.length" :key="n"></i></div>
     <div class="shell story__pin">
       <div class="story__stage">
-        <div class="story__clock">
+        <div class="story__clock" ref="clock">
           <canvas ref="cv" class="story__bg" aria-hidden="true"></canvas>
           <p class="eyebrow">My story</p>
           <h2 class="story__h">Let's go back in time.</h2>
@@ -32,6 +32,7 @@
 </template>
 <script setup lang="ts">
 const cur = ref(0), prog = ref(0), dotTop = ref(0)
+const clock = ref<HTMLElement | null>(null)
 const items = ref<HTMLElement[]>([]), list = ref<HTMLElement>(), root = ref<HTMLElement>(), cv = ref<HTMLCanvasElement>()
 const { mode } = useTheme()
 const digits = computed(() => story[cur.value].year.split('').map(Number))
@@ -93,7 +94,9 @@ onMounted(() => {
   addEventListener('resize', resize)
   onBeforeUnmount(() => removeEventListener('resize', resize))
   const update = () => {
-    const mid = innerHeight * 0.5
+    // on phones the year bar covers the top of the screen: the reading line is the middle of what is left below it
+    const bar = innerWidth < 640 ? clock.value?.getBoundingClientRect().bottom ?? 0 : 0
+    const mid = bar + (innerHeight - bar) * 0.5
     let best = 0, dist = Infinity
     items.value.forEach((el, i) => { const r = el.getBoundingClientRect(); const d = Math.abs(r.top + Math.min(r.height, 260) / 2 - mid); if (d < dist) { dist = d; best = i } })
     cur.value = best
@@ -149,14 +152,14 @@ html[data-mode="dark"] .story__when{color:#D9C6C6}
 .ch__b li{position:relative;padding-left:1.1rem;font-size:1rem;line-height:1.55;color:rgba(var(--fg-rgb),.78)}
 .ch__b li::before{content:"";position:absolute;left:0;top:.72em;width:.45rem;height:1.5px;background:rgba(var(--fg-rgb),.45)}
 @media(min-width:1280px){.ch__t{font-size:2.15rem}}
-@media(max-width:767.98px){
-  .story__pin{padding:0 0 1.5rem}.story__stage{grid-template-columns:1fr;gap:0}
-  .story__clock{top:0;height:auto;margin:0 -1.25rem;padding-block:4.8rem .9rem;padding-inline:1.25rem;z-index:3;justify-content:flex-start;background:#F4F1EE;border-bottom:1px solid rgba(26,24,24,.1);box-shadow:0 10px 16px -12px rgba(26,24,24,.25)}
-  html[data-mode="dark"] .story__clock{background:#171515;border-bottom-color:rgba(232,228,224,.08)}
+@media(max-width:639.98px){
+  .story__pin{padding:0 1.25rem 1.25rem}.story__stage{grid-template-columns:minmax(0,1fr);gap:0}
+  .story__clock{top:0;height:auto;margin:0 -1.25rem;padding-block:4.8rem .7rem;padding-inline:1.25rem;z-index:3;justify-content:flex-start;background:#F4F1EE;border-bottom:1px solid rgba(var(--fg-rgb),.1);box-shadow:0 10px 16px -12px rgba(var(--fg-rgb),.25)}
+  html[data-mode="dark"] .story__clock{background:#171515}
   .story__bg{display:none}
-  .story__clock .eyebrow{display:none}.story__h{margin-top:0;font-size:1.6rem}.story__yr{margin-top:.35rem;font-size:clamp(3.4rem,17vw,4.5rem)}
-  .story__when{margin-top:.25rem;font-size:.6875rem}.story__meter{margin-top:.5rem}
-  .story__line{padding-top:1rem;padding-bottom:6vh}.story__list{padding-left:2.1rem}.ch{padding:1.75rem 0}.ch__t{font-size:1.45rem}
+  .story__clock .eyebrow{display:none}.story__h{margin-top:0;font-size:1.45rem}.story__yr{margin-top:.2rem;font-size:clamp(3rem,15vw,4rem)}
+  .story__when{margin-top:.2rem;font-size:.6875rem}.story__meter{margin-top:.4rem;font-size:.8125rem}
+  .story__line{padding-top:.75rem;padding-bottom:2rem}.story__list{padding-left:2rem}.ch{padding:1.5rem 0}.ch__t{font-size:1.4rem}.ch__date{margin-bottom:.5rem}.ch__org{margin-bottom:.7rem}
 }
 @media(prefers-reduced-motion:reduce){.story__bg{display:none}.ch{opacity:1}.dg__c{transition:none}.story__amb i{animation:none}}
 </style>

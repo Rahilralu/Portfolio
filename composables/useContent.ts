@@ -65,7 +65,7 @@ export const doors: Door[] = [
 ]
 
 export const story = [
-  { year: '2026', when: '2026 — Now', title: 'Intern, ERP solutions', place: 'Centronne', points: ['Interning at Centronne, building ERP solutions.', 'ERPNext lead-to-cash workflow: lead, deal, quotation, sales order, then project scheduling and invoicing/payments.'] },
+  { year: '2026', when: '2026 — Now', title: 'Software Engineer Intern', place: 'Centric Innovation · Hybrid, part-time', points: ['Software Engineer Intern at Centric Innovation (hybrid, part-time), building ERP solutions.', 'ERPNext lead-to-cash workflow: lead, deal, quotation, sales order, then project scheduling and invoicing/payments.'] },
   { year: '2026', when: 'Aug 2026 — Now', title: 'DSA Tutor', place: 'ACES CUSAT, Kochi', points: ['Teaching data structures and algorithms to fellow CS students.', 'Practising DSA in Java on LeetCode myself.'] },
   { year: '2025', when: 'Jun 2025 — Oct 2026', title: 'Full Stack Web Developer Intern', place: 'Cognifyr (CITTIC, CUSAT)', points: ['CogniHR on Frappe/ERPNext v16 in Vue.js and Nuxt 3, covering all HRMS modules.', 'Role-based permissions, a Dockerized ERPNext + HRMS setup, and the cognifyr.co redesign.'] },
   { year: '2025', when: 'Jun 2025 — May 2026', title: 'Web Developer', place: 'ACES CUSAT, Kochi', points: ['Built acescusat.tech with the tech team for a 180+ member CS association.'] },

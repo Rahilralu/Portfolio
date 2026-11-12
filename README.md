@@ -56,7 +56,7 @@ Full-screen pages you walk into from a door, each with the skill list and projec
 
 ## Timeline
 
-2026 — Now **Intern, ERP solutions** at Centronne · Aug 2026 — Now **DSA Tutor**, ACES CUSAT · Jun 2025 — Oct 2026 **Full Stack Web Developer Intern**, Cognifyr · Jun 2025 — May 2026 **Web Developer**, ACES CUSAT · May — Jun 2025 **UI/UX Design Intern**, PHICSIT InfoTech · 2024 — 2028 **B.Tech, Computer Science**, CUSAT (CGPA 8.82).
+2026 — Now **Software Engineer Intern** (hybrid, part-time) at Centric Innovation · Aug 2026 — Now **DSA Tutor**, ACES CUSAT · Jun 2025 — Oct 2026 **Full Stack Web Developer Intern**, Cognifyr · Jun 2025 — May 2026 **Web Developer**, ACES CUSAT · May — Jun 2025 **UI/UX Design Intern**, PHICSIT InfoTech · 2024 — 2028 **B.Tech, Computer Science**, CUSAT (CGPA 8.82).
 
 ## Editing content
 
