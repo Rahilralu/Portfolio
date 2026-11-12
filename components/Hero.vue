@@ -16,7 +16,7 @@
         <div class="rv ctas" style="--d:560ms">
           <button class="pill pill--arrow pill--dark" @click="openContact()"><span class="pill__in">Hire me <span class="pill__badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></span></button>
           <a class="pill pill--outline" href="#works" @click.prevent="scrollTo('#works', -10)"><span class="pill__in">See my work</span></a>
-          <a class="pill pill--white ctas__cv" href="/Muhammed_Rahil_Nazar_Resume.pdf" download><span class="pill__in">Resume</span></a>
+          <a class="pill pill--outline ctas__cv" href="/Muhammed_Rahil_Nazar_Resume.pdf" download><span class="pill__in">Resume</span></a>
         </div>
       </div>
     </div>
