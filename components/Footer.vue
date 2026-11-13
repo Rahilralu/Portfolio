@@ -23,7 +23,7 @@
             <li><a :href="profile.x" target="_blank" rel="noreferrer">X</a></li>
             <li><a :href="`mailto:${profile.email}`">Email</a></li></ul></div>
           <div><h3>Status</h3><ul>
-            <li class="st"><i class="dot"></i>Available for work</li>
+            <li class="st">Available for work</li>
             <li class="st">Remote-first, worldwide</li>
             <li class="st">{{ profile.location }}</li></ul></div>
         </div>
@@ -67,7 +67,6 @@ html[data-mode="dark"] .sf{--sf-bg:#0F0E0E;box-shadow:inset 0 1px 0 rgba(232,228
 .sf__cols button,.sf__cols a{display:inline-flex;align-items:center;min-height:2.25rem;padding:0;color:rgba(var(--sf-rgb),.88);font-size:1rem;font-weight:500;text-align:left;transition:color .2s,transform .3s var(--e-soft)}
 .sf__cols button:hover,.sf__cols a:hover{color:#fff;transform:translateX(.2rem)}
 .sf__cols li.st{display:flex;align-items:center;gap:.55rem;min-height:2.25rem;font-size:1rem;color:rgba(var(--sf-rgb),.88)}
-.sf__cols .dot{flex:none;width:.5rem;height:.5rem;border-radius:50%;background:#8FBF7A}
 .sf__bot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid rgba(var(--sf-rgb),.12);font-size:.875rem;color:rgba(var(--sf-rgb),.6)}
 .sf__right{display:flex;align-items:center;gap:1.75rem}
 .sf__bot a,.sf__bot button{display:inline-flex;align-items:center;min-height:2.25rem;color:inherit;transition:color .2s}
