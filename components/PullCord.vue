@@ -25,7 +25,8 @@ const { mode, toggle } = useTheme()
 const { active, walking } = useDoor()
 const away = computed(() => walking.value)
 const hitEl = ref<HTMLElement>()
-const rest = 150, y = ref(rest), angle = ref(0), dragging = ref(false)
+let rest = 150
+const y = ref(rest), angle = ref(0), dragging = ref(false)
 let vy = 0, va = 0, raf = 0, startY = 0, moved = 0, last = 0
 const hitStyle = computed(() => {
   const r = (angle.value * Math.PI) / 180
@@ -64,7 +65,11 @@ function down(e: PointerEvent) {
   }
   addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up)
 }
+// a shorter cord below 1200px keeps the bulb clear of headings and the room's door counter
+const fitRest = () => { const r = innerWidth < 1200 ? 96 : 150; if (r === rest) return; rest = r; if (!dragging.value) kick() }
 onMounted(() => {
+  fitRest(); y.value = rest; addEventListener('resize', fitRest)
+  onBeforeUnmount(() => removeEventListener('resize', fitRest))
   // gentle idle sway so it reads as hanging
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { va = 5; kick() }
 })

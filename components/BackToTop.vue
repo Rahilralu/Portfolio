@@ -8,11 +8,14 @@
 </template>
 <script setup lang="ts">
 const show = ref(false), pct = ref(0), atFoot = ref(false), onWall = ref(false), scrollTo = useScrollTo()
+let lastY = 0, up = true
 onMounted(() => {
   const f = () => {
     const max = document.documentElement.scrollHeight - innerHeight
     pct.value = max > 0 ? Math.round((scrollY / max) * 100) : 0
-    show.value = scrollY > innerHeight * 0.6
+    // on phones it covers text, so it only appears while scrolling back up
+    if (Math.abs(scrollY - lastY) > 6) { up = scrollY < lastY; lastY = scrollY }
+    show.value = scrollY > innerHeight * 0.6 && (innerWidth >= 640 || up)
   }
   addEventListener('scroll', f, { passive: true }); f()
   // the footer has its own "Back to top", so step aside while it is on screen

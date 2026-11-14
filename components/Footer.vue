@@ -11,11 +11,11 @@
           <button class="sf__ghost" @click="scrollTo('#works', -10)">See my work</button>
         </div>
         <div class="sf__cols">
-          <div><h3>Work</h3><ul><li v-for="d in doors" :key="d.id"><button @click="toDoor(d.id)">{{ d.nav }}</button></li></ul></div>
+          <div><h3>Work</h3><ul><li v-for="d in doors" :key="d.id"><a :href="`/${d.path}`" @click.exact.prevent="toDoor(d.id)">{{ d.nav }}</a></li></ul></div>
           <div><h3>Navigate</h3><ul>
-            <li><button @click="scrollTo('#main')">Home</button></li>
-            <li><button @click="scrollTo('#leetcode', -30)">LeetCode</button></li>
-            <li><button @click="scrollTo('#story', -30)">My story</button></li>
+            <li><a href="/" @click.exact.prevent="scrollTo('#main')">Home</a></li>
+            <li><a href="/#leetcode" @click.exact.prevent="scrollTo('#leetcode', -30)">LeetCode</a></li>
+            <li><a href="/#story" @click.exact.prevent="scrollTo('#story', -30)">My story</a></li>
             <li><button @click="openContact()">Contact</button></li></ul></div>
           <div><h3>Connect</h3><ul>
             <li><a :href="profile.github" target="_blank" rel="noreferrer">GitHub</a></li>
@@ -64,12 +64,12 @@ html[data-mode="dark"] .sf{--sf-bg:#0F0E0E;box-shadow:inset 0 1px 0 rgba(232,228
 @media(min-width:768px){.sf__cols{grid-template-columns:repeat(4,minmax(0,1fr));gap:2rem}}
 .sf__cols h3{margin-bottom:1.1rem;font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(var(--sf-rgb),.55)}
 .sf__cols ul{display:flex;flex-direction:column;gap:.15rem}
-.sf__cols button,.sf__cols a{display:inline-flex;align-items:center;min-height:2.25rem;padding:0;color:rgba(var(--sf-rgb),.88);font-size:1rem;font-weight:500;text-align:left;transition:color .2s,transform .3s var(--e-soft)}
+.sf__cols button,.sf__cols a{display:inline-flex;align-items:center;min-height:2.75rem;padding:0;color:rgba(var(--sf-rgb),.88);font-size:1rem;font-weight:500;text-align:left;transition:color .2s,transform .3s var(--e-soft)}
 .sf__cols button:hover,.sf__cols a:hover{color:#fff;transform:translateX(.2rem)}
-.sf__cols li.st{display:flex;align-items:center;gap:.55rem;min-height:2.25rem;font-size:1rem;color:rgba(var(--sf-rgb),.88)}
+.sf__cols li.st{display:flex;align-items:center;gap:.55rem;min-height:2.75rem;font-size:1rem;color:rgba(var(--sf-rgb),.88)}
 .sf__bot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid rgba(var(--sf-rgb),.12);font-size:.875rem;color:rgba(var(--sf-rgb),.6)}
 .sf__right{display:flex;align-items:center;gap:1.75rem}
-.sf__bot a,.sf__bot button{display:inline-flex;align-items:center;min-height:2.25rem;color:inherit;transition:color .2s}
+.sf__bot a,.sf__bot button{display:inline-flex;align-items:center;min-height:2.75rem;color:inherit;transition:color .2s}
 .sf__bot a{text-decoration:underline;text-underline-offset:.2em;text-decoration-color:rgba(var(--sf-rgb),.3)}
 .sf__bot a:hover,.sf__bot button:hover{color:var(--sf-fg)}
 </style>

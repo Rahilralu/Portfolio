@@ -1,0 +1,37 @@
+# Keeps the LeetCode section current: every hour, read the public profile and commit data/leetcode.json if the numbers changed.
+# The push makes Cloudflare Pages rebuild the site. Nothing to configure; run it by hand from the Actions tab if you like.
+name: LeetCode sync
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: leetcode-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch LeetCode stats
+        run: node scripts/sync-leetcode.mjs
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain -- data/leetcode.json)" ]; then echo "No change."; exit 0; fi
+          solved=$(node -p "require('./data/leetcode.json').solved")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/leetcode.json
+          git commit -m "chore: update LeetCode stats (${solved} solved)"
+          git pull --rebase --autostash
+          git push

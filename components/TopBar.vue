@@ -3,11 +3,11 @@
     <div class="shell hdr__in">
       <nav aria-label="Primary">
         <div class="nav">
-          <a href="#main" @click.prevent="go('#main')">Home</a>
-          <a v-for="d in doors" :key="d.id" :href="`#${d.id}`" @click.prevent="toDoor(d.id)">{{ d.nav }}</a>
-          <a href="#leetcode" @click.prevent="go('#leetcode')">LeetCode</a>
-          <a href="#story" @click.prevent="go('#story')">My story</a>
-          <a href="#contact" @click.prevent="go('#contact')">Contact</a>
+          <a href="/" :aria-current="cur === 'home' ? 'location' : undefined" @click.exact.prevent="go('#main')">Home</a>
+          <a v-for="d in doors" :key="d.id" :href="`/${d.path}`" :aria-current="cur === d.id ? 'location' : undefined" @click.exact.prevent="toDoor(d.id)">{{ d.nav }}</a>
+          <a href="/#leetcode" :aria-current="cur === 'leetcode' ? 'location' : undefined" @click.exact.prevent="go('#leetcode')">LeetCode</a>
+          <a href="/#story" :aria-current="cur === 'story' ? 'location' : undefined" @click.exact.prevent="go('#story')">My story</a>
+          <a href="/#contact" :aria-current="cur === 'contact' ? 'location' : undefined" @click.exact.prevent="go('#contact')">Contact</a>
         </div>
       </nav>
       <div class="hdr__right">
@@ -23,10 +23,12 @@ const stuck = ref(false), hidden = ref(false)
 const { openNav } = useNav()
 const { active, walking } = useDoor()
 const nav = useGo()
+const { current: cur, track } = useSection()
 watch(walking, (w) => { hidden.value = !!w })
 function go(h: string) { nav.go(h, h === '#main' ? 0 : -30) }
 function toDoor(id: string) { nav.toDoor(id) }
 onMounted(() => {
+  track()
   const onScroll = () => { stuck.value = scrollY > 40 }
   addEventListener('scroll', onScroll, { passive: true }); onScroll()
   onBeforeUnmount(() => removeEventListener('scroll', onScroll))
@@ -42,7 +44,7 @@ onMounted(() => {
 @media(min-width:640px){.hdr__in{padding-block:1.5rem}}
 nav{flex:1;min-width:0}
 .nav{display:none}
-@media(min-width:1200px){.nav{display:flex;gap:1.4rem;font-size:1rem;white-space:nowrap}.nav a{opacity:.8;transition:opacity .25s}.nav a:hover{opacity:1}.menu-btn{display:none}}
+@media(min-width:1200px){.nav{display:flex;gap:1.4rem;font-size:1rem;white-space:nowrap}.nav a{opacity:.8;padding-block:.6rem;margin-block:-.6rem;transition:opacity .25s}.nav a:hover,.nav a[aria-current]{opacity:1}.nav a[aria-current]{text-decoration:underline;text-underline-offset:.35em;text-decoration-thickness:1.5px}.menu-btn{display:none}}
 @media(max-width:1199.98px){nav{display:none}.hdr__right{flex:1}.menu-btn{order:-1}}
 .hdr__right{display:flex;align-items:center;gap:.75rem}
 .menu-btn{transition:background .25s}.menu-btn:hover{background:var(--chip-bg-h)}

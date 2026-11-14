@@ -14,8 +14,8 @@
         </div>
         <div class="roomv__grid">
           <article v-for="(p, pi) in door.projects" :key="p.title" class="pc" :style="{ '--i': pi }">
-            <a v-if="p.image && p.link" class="shot" :href="p.link" target="_blank" rel="noreferrer" :aria-label="`Open ${p.title}`"><img :src="p.image" :alt="`${p.title} screenshot`" loading="lazy" /><span class="shot__go">Open site ↗</span></a>
-            <img v-else-if="p.image" :src="p.image" :alt="p.title" loading="lazy" />
+            <a v-if="p.image && p.link" class="shot" :href="p.link" target="_blank" rel="noreferrer" :aria-label="`Open ${p.title}`"><img :src="p.image" width="900" height="562" :alt="`${p.title} screenshot`" loading="lazy" /><span class="shot__go">Open site ↗</span></a>
+            <img v-else-if="p.image" :src="p.image" width="900" height="562" :alt="p.title" loading="lazy" />
             <b class="mono">{{ p.sub }}</b>
             <h3>{{ p.title }}</h3>
             <ul class="pts"><li v-for="pt in p.points" :key="pt">{{ pt }}</li></ul>
@@ -63,6 +63,7 @@ const nextDoor = () => openDoor(doors[(index.value + 1) % doors.length].id)
 .roomv.on .roomv__grid{opacity:1;transform:none;transition-delay:.5s}
 .roomv.on .roomv__next{opacity:1;transform:none;transition-delay:.7s}
 .roomv__top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-block:.5rem 3rem}
+.roomv__top{padding-right:4.5rem}
 .roomv__door{font-size:.75rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:rgba(var(--fg-rgb),.5)}
 .roomv__head{display:flex;flex-direction:column;gap:1.25rem;max-width:44rem;padding-bottom:3.5rem}
 .roomv__title{font-size:2.75rem;font-weight:600;line-height:.98;letter-spacing:-.02em}
@@ -74,7 +75,7 @@ const nextDoor = () => openDoor(doors[(index.value + 1) % doors.length].id)
 @media(min-width:1024px){.roomv__grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}}
 .pc{display:flex;flex-direction:column;gap:.5rem;padding:1.5rem;border-radius:var(--radius-card-sm);border:1px solid var(--line);background:rgba(var(--fg-rgb),.03);transition:transform .5s var(--e-soft),border-color .3s,background .3s}
 .pc:hover{transform:translateY(-4px);border-color:rgba(var(--fg-rgb),.22);background:rgba(var(--fg-rgb),.05)}
-.pc img{border-radius:.9rem;border:1px solid var(--line);margin-bottom:.6rem;aspect-ratio:16/10;object-fit:cover;width:100%}
+.pc img{border-radius:.9rem;border:1px solid var(--line);margin-bottom:.6rem;aspect-ratio:16/10;object-fit:cover;width:100%;height:auto}
 .shot{position:relative;display:block;margin-bottom:.6rem;border-radius:.9rem;overflow:hidden;border:1px solid var(--line)}
 .shot img{margin:0;border:0;border-radius:0;transition:transform .6s var(--e-soft)}
 .shot:hover img{transform:scale(1.04)}
@@ -84,7 +85,7 @@ const nextDoor = () => openDoor(doors[(index.value + 1) % doors.length].id)
 .pc h3{font-size:1.6rem;font-weight:600;letter-spacing:-.02em;line-height:1.1}
 .pts{display:grid;gap:.4rem;font-size:.95rem;color:rgba(var(--fg-rgb),.72)}.pts li::before{content:'– '}
 .stack{font-size:.75rem;color:rgba(var(--fg-rgb),.5);margin-top:.3rem}
-.pc .links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}.pc .pill{align-self:flex-start}
+.pc .links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:auto;padding-top:.7rem}.pc .pill{align-self:flex-start}
 .roomv__next{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:4rem}
 @media(prefers-reduced-motion:reduce){.roomv,.roomv__top,.roomv__head,.roomv__grid,.roomv__next{transition:none;opacity:1;transform:none}}
 </style>

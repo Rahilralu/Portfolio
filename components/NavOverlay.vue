@@ -8,7 +8,7 @@
       <nav class="shell navm__nav" aria-label="Menu">
         <ul>
           <li v-for="(it, i) in items" :key="it.label">
-            <button class="navm__item" :style="{ '--d': 120 + i * 60 + 'ms' }" @click="pick(it)"><small class="mono">{{ String(i + 1).padStart(2, '0') }}</small><span>{{ it.label }}</span></button>
+            <a class="navm__item" :href="it.href" :aria-current="cur === it.key ? 'location' : undefined" :style="{ '--d': 120 + i * 60 + 'ms' }" @click.exact.prevent="pick(it)"><small class="mono">{{ String(i + 1).padStart(2, '0') }}</small><span>{{ it.label }}</span></a>
           </li>
         </ul>
       </nav>
@@ -21,14 +21,16 @@ const { open, closeNav } = useNav()
 const nav = useGo()
 const { openContact } = useContact()
 const mounted = ref(false), shown = ref(false), root = ref<HTMLElement>()
+const { current: cur } = useSection()
 const items = [
-  { label: 'Home', t: '#main' },
-  ...doors.map((d) => ({ label: d.nav, door: d.id })),
-  { label: 'LeetCode', t: '#leetcode' },
-  { label: 'My story', t: '#story' },
-  { label: 'Contact', contact: true },
-] as { label: string; t?: string; door?: string; contact?: boolean }[]
+  { label: 'Home', t: '#main', href: '/', key: 'home' },
+  ...doors.map((d) => ({ label: d.nav, door: d.id, href: `/${d.path}`, key: d.id })),
+  { label: 'LeetCode', t: '#leetcode', href: '/#leetcode', key: 'leetcode' },
+  { label: 'My story', t: '#story', href: '/#story', key: 'story' },
+  { label: 'Contact', contact: true, href: '/#contact', key: 'contact' },
+] as { label: string; t?: string; door?: string; contact?: boolean; href: string; key: string }[]
 useScrollLock(open)
+useFocusTrap(root, open)
 watch(open, async (v) => {
   if (v) { mounted.value = true; await nextTick(); requestAnimationFrame(() => { shown.value = true; root.value?.focus() }) }
   else { shown.value = false; setTimeout(() => (mounted.value = false), 450) }
@@ -57,6 +59,7 @@ const mail = () => { location.href = `mailto:${profile.email}` }
 .navm.open .navm__item{transform:none;opacity:1}
 .navm__item small{font-size:1rem;font-weight:400;color:rgba(255,255,255,.3);transition:color .3s}
 .navm__item span{color:rgba(255,255,255,.7);transition:color .3s}
+.navm__item[aria-current] span{color:#fff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.2em}
 .navm__item:hover small{color:var(--accent-from)}.navm__item:hover span{color:#fff}
 @media(min-width:640px){.navm__item{font-size:3.75rem}}
 .navm__bot{display:flex;flex-direction:column;gap:.75rem;border-top:1px solid rgba(255,255,255,.1);padding-block:1.5rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.025em;color:rgba(255,255,255,.45)}

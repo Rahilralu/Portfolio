@@ -3,7 +3,7 @@
     <div class="hero__vig"></div>
     <div class="hero__stage">
       <div class="fig">
-        <img src="/profile.png" alt="Illustrated portrait of Muhammed Rahil Nazar" />
+        <img src="/profile.webp" width="1024" height="855" fetchpriority="high" alt="Illustrated portrait of Muhammed Rahil Nazar" />
       </div>
     </div>
     <div class="shell hero__content">
@@ -41,6 +41,7 @@ html[data-mode="dark"] .hero::before{opacity:1}
 .hero__stage{position:absolute;inset:0;z-index:2;pointer-events:none}
 .fig{position:absolute;bottom:var(--bar-h);left:50%;height:var(--fig-h);aspect-ratio:801/1033;pointer-events:auto;opacity:0;transform:translate(-50%,2.5rem);transition:opacity 1.1s var(--e-soft) 120ms,transform 1.3s var(--e-soft) 120ms}
 body.ready .fig{opacity:1;transform:translate(-50%,0)}
+@media(min-width:640px) and (max-width:1023.98px){.hero{--fig-h:min(44rem,52svh)}}
 @media(min-width:1024px){
   .fig{height:min(calc(100% - var(--bar-h) - 6rem),58rem,calc((min(100vw,var(--shell)) - 2*var(--gut))*.44*1033/801));left:auto;right:calc(var(--gut) + (100% - min(100%,var(--shell)))/2);transform:translateY(2.5rem)}
   body.ready .fig{transform:none}
@@ -63,7 +64,7 @@ body.ready .fig{opacity:1;transform:translate(-50%,0)}
 @media(max-width:639.98px){.ctas__cv{display:none}.ctas{gap:.5rem}.ctas :deep(.pill__in){padding-inline:1.1rem}.ctas :deep(.pill--arrow .pill__in){padding:.375rem .375rem .375rem 1.1rem}}
 .hero__bar{position:relative;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:.75rem;height:var(--bar-h);border-top:1px solid rgba(var(--fg-rgb),.1);font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.025em;color:rgba(var(--fg-rgb),.72);max-width:none;padding-inline:max(1.25rem,calc((100vw - var(--shell))/2 + var(--gut)))}
 .mid{display:none}@media(min-width:640px){.mid{display:inline}}
-.scroll{display:inline-flex;align-items:center;gap:.5rem}
+.scroll{display:inline-flex;align-items:center;gap:.5rem;min-height:2.5rem}
 .scroll i{font-style:normal;display:inline-block;animation:nudge 1.8s var(--e-snap) infinite}
 @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 </style>

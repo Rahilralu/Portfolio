@@ -25,7 +25,7 @@ npm run preview      # serve the built site
 | **Pull cord** | A hanging cord with pendulum physics. Tap it, or flick it down, to switch light/dark mode; the new theme spreads from the bulb as a circle. |
 | **Hero** | "Hi, I'm Rahil. I am a …" with a split-flap calendar that cycles Full Stack Developer, Frontend Developer, Backend Engineer, AI Builder, UI/UX Designer; portrait, Hire me / See my work / Resume buttons, status bar. |
 | **Doors** | Four doors (Frontend, Backend, AI & RAG, UI/UX). Hovering fades the others and shows what's behind it; clicking presses the lever, swings the door inward and zooms you through into that skill's room. |
-| **LeetCode** | Animated ring (277 solved) and Easy/Medium/Hard bars (201 / 68 / 8) for `@Rahil_ralu`. |
+| **LeetCode** | Animated ring and Easy/Medium/Hard bars for `@Rahil_ralu`. The numbers refresh themselves every hour (see *LeetCode auto-sync* below). |
 | **My story** | Sticky odometer year, a canvas of clock dials behind it that winds back as you scroll, a travelling dot on the timeline, and a rewinding clock icon. |
 | **Footer** | "Need something built?" call to action, links, resume download, and `rahilralu` across the full width. |
 
@@ -60,7 +60,7 @@ Full-screen pages you walk into from a door, each with the skill list and projec
 
 ## Editing content
 
-Almost everything is data in **`composables/useContent.ts`**: `profile`, `roles`, `doors` (skills and project cards), `doorInfo` (hover text), `story` (timeline) and `leetcode`. Screenshots go in `public/` and are referenced by a project's `image`. A card can have a `link` (live site, opens when the screenshot is clicked) and an optional `repo` (GitHub button).
+Almost everything is data in **`composables/useContent.ts`**: `profile`, `roles`, `doors` (skills and project cards), `doorInfo` (hover text), `story` (timeline) and `leetcode` (profile link and colours; its counts come from `data/leetcode.json`). Screenshots go in `public/` and are referenced by a project's `image`. A card can have a `link` (live site, opens when the screenshot is clicked) and an optional `repo` (GitHub button).
 
 ## Structure
 
@@ -77,6 +77,15 @@ new/
 ```
 
 For how the door walk-in and navigation work, and what is easy to break, see `../CLAUDE.md`.
+
+## LeetCode auto-sync
+
+The LeetCode numbers live in **`data/leetcode.json`** (solved, total, and Easy/Medium/Hard counts), not in code. A GitHub Actions workflow (`.github/workflows/leetcode-sync.yml`) runs every hour, runs `scripts/sync-leetcode.mjs` to read the public profile, and commits the file only if the numbers changed. That push makes Cloudflare Pages rebuild, so a new solve appears on the site within about an hour. Nothing to configure: pushing the workflow to `main` is enough.
+
+- Run it by hand: `node scripts/sync-leetcode.mjs` (Node 20+), or Actions, *LeetCode sync*, *Run workflow*.
+- The username comes from `leetcode.user` in `useContent.ts` (override with `LEETCODE_USER`).
+- If LeetCode is unreachable or returns something odd, the file is left alone and the run fails, so GitHub emails you; the site keeps the last good numbers.
+- GitHub pauses scheduled workflows after about 60 days without repo activity; re-enable it in the Actions tab if that happens.
 
 ## Things to know
 

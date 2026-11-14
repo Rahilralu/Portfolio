@@ -1,6 +1,6 @@
 @font-face{font-family:'Onest';font-style:normal;font-weight:300 800;font-display:swap;src:url('/fonts/onest-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 :root{
-  --background:#E8E4E0; --foreground:#1A1818; --ink:#1A1818; --muted:#857878; --subtle:#B5A8A8; --line:#D5CDCA;
+  --background:#E8E4E0; --foreground:#1A1818; --ink:#1A1818; --muted:#6B6060; --subtle:#B5A8A8; --line:#D5CDCA;
   --surface:#DED8D4; --surface-2:#D3CBC8; --accent:#6B5C5C; --accent-from:#C4B0B0; --accent-to:#6B5C5C;
   --hero-from:#EEEAE6; --hero-mid:#E8E4E0; --hero-to:#D8CDCA; --vig:rgba(240,236,232,.35);
   --radius-card:2rem; --radius-card-sm:1.25rem; --radius-control:.875rem;
@@ -44,7 +44,7 @@ svg{display:block;width:1em;height:1em;flex:none}
 /* adaptive rem grid: authored at 1440px */
 @media(max-width:1920px){html{font-size:.833333vw}}
 @media(max-width:1440px){html{font-size:1.111111vw}}
-@media(max-width:1024px){html{font-size:1.5625vw}}
+@media(max-width:1024px){html{font-size:max(14px,1.5625vw)}}
 @media(max-width:640px){html{font-size:4.444444vw}}
 
 .shell{max-width:var(--shell);margin-inline:auto;padding-inline:1.25rem;width:100%}

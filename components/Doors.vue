@@ -10,7 +10,7 @@
               :style="{ '--i': i, '--door': light[d.id], '--door-dk': info[d.id].dk, '--glow': info[d.id].glow }">
             <button class="doorway" :class="{ ajar: opening === d.id }" :disabled="busyUi" :aria-disabled="busyUi" :aria-label="`Open ${d.title}`"
               @pointerenter="enter(i, $event)" @pointermove="move" @pointerleave="leaveHover"
-              @pointerdown="pressed = i" @pointerup="pressed = -1" @click="openDoor(d.id)" @focus="hover = i" @blur="hover = null">
+              @pointerdown="pressed = i" @pointerup="pressed = -1" @click="openDoor(d.id)" @focus="onFocus(i, $event)" @blur="hover = null">
               <span class="casing"></span>
               <span class="opening"><span class="room"></span>
                 <span class="door"><span class="door__flute"></span><span class="door__shade"></span>
@@ -34,7 +34,7 @@
           <p class="dinfo__t">{{ info[doors[cur].id].tag }}</p>
           <ul class="dinfo__p"><li v-for="b in info[doors[cur].id].bullets" :key="b">{{ b }}</li></ul>
         </div>
-        <div class="doors__dots" aria-hidden="true"><i v-for="(d, i) in doors" :key="d.id" :class="{ on: cur === i }"></i></div>
+        <div class="doors__dots" aria-hidden="true"><i v-for="(d, i) in doors" :key="d.id" :class="{ on: cur === i }"></i><span class="doors__hint">Tap the door to enter</span></div>
       </div>
     </div>
     <div class="door-cursor" ref="dc" :class="{ on: hover !== null && !mobile }">Click to enter</div>
@@ -64,6 +64,8 @@ function layout() {
   })
 }
 function enter(i: number, e: PointerEvent) { if (e.pointerType === 'mouse' && !busy) hover.value = i; move(e) }
+// only keyboard focus lights up a door's notes; a script-restored focus after a mouse click stays quiet
+function onFocus(i: number, e: FocusEvent) { if ((e.target as HTMLElement).matches(':focus-visible')) hover.value = i }
 function leaveHover() { hover.value = null; pressed.value = -1 }
 function move(e: PointerEvent) { if (dc.value) dc.value.style.transform = `translate(${e.clientX + 16}px,${e.clientY + 16}px)` }
 function onRowScroll() {
@@ -173,9 +175,12 @@ async function leaveRoom() {
     requestAnimationFrame(step)
   })
   sec.style.transform = ''; sec.style.transformOrigin = ''; sec.classList.remove('through')
+  const leftId = opening.value
   opening.value = null // the door swings shut
   mForce = -1; mApply()
   walking.value = false; holdScroll(false); busy = false; busyUi.value = false
+  // give keyboard users their place back: focus the door they just came out of
+  if (!pending && leftId) { const k = doors.findIndex((d) => d.id === leftId); (units.value[k]?.querySelector('.doorway') as HTMLElement | null)?.focus({ preventScroll: true }) }
   runPending()
 }
 
@@ -336,7 +341,7 @@ onMounted(() => {
 html[data-mode="dark"] .doors__tex{opacity:.7;background:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1.4px) 0 0/9px 9px,radial-gradient(50% 35% at 50% 0%,rgba(255,236,214,.05),transparent 70%)}
 .doors__wall{position:relative;display:flex;flex-direction:column;align-items:center;gap:1.4rem}
 .paint{position:relative;z-index:3;pointer-events:none;text-align:center;font-weight:700;letter-spacing:-.03em;line-height:.95;color:var(--paint);font-size:2.6rem;max-width:14ch;text-wrap:balance;padding:.08em 0 .14em;clip-path:inset(-20% -6% -30% -6%)}
-@media(min-width:640px){.paint{font-size:4rem;max-width:none}}@media(min-width:1024px){.paint{font-size:4.75rem}}
+@media(min-width:640px){.paint{font-size:4rem;max-width:none}}@media(min-width:640px) and (max-width:1199.98px){.paint{max-width:min(100%,calc(100vw - 14rem))}}@media(min-width:1024px){.paint{font-size:4.75rem}}
 .doors.pre .paint{clip-path:inset(-20% 100% -30% -6%)}
 .doors.in .paint{transition:clip-path 1.5s cubic-bezier(.65,0,.25,1) .1s}
 .mbr{display:none}@media(max-width:639.98px){.mbr{display:inline}}
@@ -349,6 +354,7 @@ html[data-mode="dark"] .doors__tex{opacity:.7;background:radial-gradient(rgba(25
   box-shadow:0 -1px 0 rgba(0,0,0,.07),0 -.5rem .9rem -.45rem rgba(0,0,0,.16)}
 html[data-mode="dark"] .doors__row::after{background:linear-gradient(180deg,rgba(255,255,255,.06) 0,rgba(255,255,255,.06) 1px,rgba(0,0,0,.3) 2px,transparent 4px,transparent 7px,rgba(0,0,0,.25) 8px,transparent 11px,rgba(0,0,0,.3) 100%),var(--base);box-shadow:0 -1px 0 rgba(0,0,0,.4),0 -.5rem .9rem -.45rem rgba(0,0,0,.5)}
 .doors__dots{display:none}
+.doors__hint{display:flex;align-items:center;height:.4rem;margin-left:.5rem;white-space:nowrap;font-size:.75rem;font-weight:500;letter-spacing:.02em;color:rgba(var(--fg-rgb),.7)}
 
 .unit{position:relative;container-type:inline-size;width:100%;max-width:min(17.5rem,calc((100svh - 19.5rem)/2.25));justify-self:center;transition:opacity .9s var(--e-soft),transform 1.1s var(--e-soft);transition-delay:calc(var(--i)*110ms + .35s)}
 .doors.pre .unit{opacity:0;transform:translateY(1.5rem)}
@@ -427,12 +433,13 @@ html[data-mode="dark"] .dinfo{--dinfo-accent:#D9C6C6}
   .paint{font-size:2.15rem;text-align:left;align-self:flex-start;max-width:none;margin:.25rem 0 .5rem}
   .dinfo--m{order:1;position:relative;width:100%;max-width:100%;margin:.9rem 0 0;padding-top:1rem;border-top:1px solid rgba(var(--fg-rgb),.1);text-align:left;opacity:1;transform:none;min-height:10.5rem}
   .dinfo--m .dinfo__h{font-size:1.5rem;line-height:1.1;margin-bottom:.35rem}
-  .dinfo--m .dinfo__t{margin-bottom:.85rem;font-size:.625rem;letter-spacing:.08em;line-height:1.4}
+  .dinfo--m .dinfo__t{margin-bottom:.85rem;font-size:.6875rem;letter-spacing:.08em;line-height:1.4}
   .dinfo--m .dinfo__p{font-size:.875rem;line-height:1.35;gap:.45rem}
   .dinfo--m .dinfo__p li{gap:.6rem}
   .doors.compact .dinfo__p{display:none}
   .doors.compact .dinfo--m{min-height:0}
-  .doors__dots{order:2;display:flex;gap:.4rem;margin:.25rem 0 0}
+  .doors__dots{order:2;display:flex;align-items:center;gap:.4rem;margin:.25rem 0 0}
+  .plate{font-size:6.8cqi;width:66cqi;letter-spacing:.06em}
   .doors__dots i{width:.4rem;height:.4rem;border-radius:999px;background:rgba(var(--fg-rgb),.2);transition:width .35s var(--e-soft),background .35s}
   .doors__dots i.on{width:1.3rem;background:var(--foreground)}
   .doors__row{order:3;display:flex;gap:var(--ug);overflow:visible;padding-inline:calc(50% - var(--uw) / 2);margin-inline:-1.25rem;width:calc(100% + 2.5rem);padding-top:2rem;margin-top:-1rem;will-change:transform;align-items:flex-end}

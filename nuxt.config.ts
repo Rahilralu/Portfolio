@@ -32,8 +32,8 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: `${SITE}/profile.png` },
       ],
       link: [
-        { rel: 'icon', href: '/profile.png' },
-        { rel: 'apple-touch-icon', href: '/profile.png' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'preload', href: '/fonts/onest-latin.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
       ],
       script: [{

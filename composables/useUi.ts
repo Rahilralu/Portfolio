@@ -60,6 +60,42 @@ export const useScrollLock = (flag: Ref<boolean>) => {
   })
 }
 
+// where the visitor is: the open room, else the home section nearest the top of the screen. `track()` is called once (TopBar).
+export const useSection = () => {
+  const { active } = useDoor()
+  const route = useRoute()
+  const sec = useState('section', () => 'home')
+  const current = computed(() => (route.name === 'legal' ? '' : active.value || sec.value))
+  const track = () => {
+    const ids = ['works', 'leetcode', 'story', 'contact']
+    const f = () => {
+      let hit = 'home'
+      for (const id of ids) { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= innerHeight * 0.4) hit = id }
+      sec.value = hit
+    }
+    addEventListener('scroll', f, { passive: true }); f()
+    onBeforeUnmount(() => removeEventListener('scroll', f))
+  }
+  return { current, track }
+}
+// keeps Tab inside an open overlay and hands focus back to whatever opened it
+export const useFocusTrap = (el: Ref<HTMLElement | undefined>, open: Ref<boolean>) => {
+  let opener: HTMLElement | null = null
+  const onKey = (e: KeyboardEvent) => {
+    const box = el.value; if (e.key !== 'Tab' || !box) return
+    const f = [...box.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input,textarea,[tabindex]:not([tabindex="-1"])')].filter((n) => n.offsetParent !== null)
+    if (!f.length) return
+    const a = document.activeElement
+    if (e.shiftKey && (a === f[0] || a === box)) { e.preventDefault(); f[f.length - 1].focus() }
+    else if (!e.shiftKey && a === f[f.length - 1]) { e.preventDefault(); f[0].focus() }
+  }
+  watch(open, (v) => {
+    if (v) { opener = document.activeElement as HTMLElement | null; addEventListener('keydown', onKey) }
+    else { removeEventListener('keydown', onKey); opener?.focus?.(); opener = null }
+  })
+  onBeforeUnmount(() => removeEventListener('keydown', onKey))
+}
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 // navigation that works from any page: leaves an open room (zooming back out), goes home if needed, then scrolls or walks in
 export const useGo = () => {

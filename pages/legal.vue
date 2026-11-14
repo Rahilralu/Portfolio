@@ -15,7 +15,7 @@ useSeo(() => ({ path: '/legal', title: 'Privacy & credits | Muhammed Rahil Nazar
 </script>
 <style scoped>
 .legal{padding-top:9rem;padding-bottom:8rem;max-width:52rem}
-.back{color:var(--muted)}
+.back{color:var(--muted);display:inline-flex;align-items:center;min-height:2.75rem}
 h1{font-size:3.4rem;font-weight:600;letter-spacing:-.03em;margin:1.5rem 0 2rem}
 h2{font-size:1.4rem;margin:2rem 0 .6rem}
 p{color:var(--muted);font-size:1.1rem;line-height:1.65;margin-bottom:1rem}

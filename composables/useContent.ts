@@ -1,3 +1,5 @@
+import lc from '~/data/leetcode.json' // refreshed hourly by scripts/sync-leetcode.mjs (see .github/workflows/leetcode-sync.yml)
+
 export const profile = {
   name: 'Muhammed Rahil Nazar',
   first: 'Rahil',
@@ -25,11 +27,11 @@ export const doors: Door[] = [
     skills: ['Vue.js', 'Nuxt 3', 'React', 'Next.js', 'Tailwind CSS', 'Vite', 'TypeScript', 'Pinia'],
     projects: [
       { title: 'CogniHR', sub: 'Cognifyr · HR platform', points: ['Contributed to all HRMS modules plus employee and organisation pages on Frappe/ERPNext v16, in Vue.js and Nuxt 3.', 'Role-based HR admin and employee views.'], stack: 'Vue, Nuxt 3, Frappe' },
-      { title: 'cognifyr.co', sub: 'Cognifyr · company website', points: ['Redesigned and built the company website in Vue; live in production.', 'Positions Cognifyr\'s governed AI agents, enterprise RAG and production AI infrastructure.'], stack: 'Vue', link: 'https://cognifyr.co/', linkLabel: 'Visit site', image: '/cognifyr-1.png' },
-      { title: 'ACES CUSAT', sub: 'Association website', points: ['Built acescusat.tech with the tech team for a 180+ member CS association.'], link: 'https://www.acescusat.tech/', linkLabel: 'Visit site', image: '/aces.png' },
-      { title: 'Real Estate Platform', sub: 'Nuxt 4 · Cloudflare', points: ['Nuxt 4, Vue 3, Pinia and TypeScript front end for a serverless property and portfolio system.'], stack: 'Nuxt 4, Pinia, TypeScript', link: 'https://real-estate.nazarrahil0000.workers.dev/', linkLabel: 'Visit live', image: '/realestate.png' },
-      { title: 'Subscription Management System', sub: 'Brightloop · billing on autopilot', points: ['Plans, quotations, subscriptions, invoices, taxes, discounts and payments in one place.', 'One login with three roles: admin, staff and customer.'], stack: 'Vue', link: 'https://15-207-220-121.sslip.io/', linkLabel: 'Visit live', image: '/brightloop.png' },
-      { title: 'Drive', sub: 'Project', points: ['Interface project from my earlier portfolio.'], image: '/drive.png' },
+      { title: 'cognifyr.co', sub: 'Cognifyr · company website', points: ['Redesigned and built the company website in Vue; live in production.', 'Positions Cognifyr\'s governed AI agents, enterprise RAG and production AI infrastructure.'], stack: 'Vue', link: 'https://cognifyr.co/', linkLabel: 'Visit site', image: '/cognifyr-1.webp' },
+      { title: 'ACES CUSAT', sub: 'Association website', points: ['Built acescusat.tech with the tech team for a 180+ member CS association.'], link: 'https://www.acescusat.tech/', linkLabel: 'Visit site', image: '/aces.webp' },
+      { title: 'Real Estate Platform', sub: 'Nuxt 4 · Cloudflare', points: ['Nuxt 4, Vue 3, Pinia and TypeScript front end for a serverless property and portfolio system.'], stack: 'Nuxt 4, Pinia, TypeScript', link: 'https://real-estate.nazarrahil0000.workers.dev/', linkLabel: 'Visit live', image: '/realestate.webp' },
+      { title: 'Subscription Management System', sub: 'Brightloop · billing on autopilot', points: ['Plans, quotations, subscriptions, invoices, taxes, discounts and payments in one place.', 'One login with three roles: admin, staff and customer.'], stack: 'Vue', link: 'https://15-207-220-121.sslip.io/', linkLabel: 'Visit live', image: '/brightloop.webp' },
+      { title: 'Drive', sub: 'Project', points: ['Interface project from my earlier portfolio.'], image: '/drive.webp' },
     ],
   },
   {
@@ -37,8 +39,8 @@ export const doors: Door[] = [
     blurb: 'APIs, queues and business workflows that stay reliable under load.',
     skills: ['Node.js', 'Express', 'REST', 'WebSockets', 'BullMQ', 'Prisma', 'ERPNext / Frappe', 'Cloudflare Workers + D1', 'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Supabase', 'Docker'],
     projects: [
-      { title: 'Fundo', sub: 'College event payments', points: ['Built solo to replace cash and WhatsApp-screenshot fee collection; tested with 10+ users.', 'Razorpay (test mode) with webhook and HMAC signature verification to reject forged confirmations.', 'Socket.io live organiser dashboard, BullMQ + Redis email queue, JWT roles, CSV export.'], stack: 'React, Express, PostgreSQL, Redis, Docker', link: 'https://fundo-doe.pages.dev/', linkLabel: 'Visit live', image: '/fundo.png', repo: 'https://github.com/Rahilralu/Fundo' },
-      { title: 'Real Estate Platform', sub: 'Serverless property system', points: ['Buildings, units, tenants and lease templates; rent schedules, PDF invoices, cash, bank and post-dated-cheque collection.', 'PBKDF2-SHA256 hashing, rotating refresh sessions, role-scoped organisations, audit logging; automated tests and a production smoke suite.'], stack: 'Cloudflare Workers, D1', link: 'https://real-estate.nazarrahil0000.workers.dev/', linkLabel: 'Visit live', image: '/realestate.png' },
+      { title: 'Fundo', sub: 'College event payments', points: ['Built solo to replace cash and WhatsApp-screenshot fee collection; tested with 10+ users.', 'Razorpay (test mode) with webhook and HMAC signature verification to reject forged confirmations.', 'Socket.io live organiser dashboard, BullMQ + Redis email queue, JWT roles, CSV export.'], stack: 'React, Express, PostgreSQL, Redis, Docker', link: 'https://fundo-doe.pages.dev/', linkLabel: 'Visit live', image: '/fundo.webp', repo: 'https://github.com/Rahilralu/Fundo' },
+      { title: 'Real Estate Platform', sub: 'Serverless property system', points: ['Buildings, units, tenants and lease templates; rent schedules, PDF invoices, cash, bank and post-dated-cheque collection.', 'PBKDF2-SHA256 hashing, rotating refresh sessions, role-scoped organisations, audit logging; automated tests and a production smoke suite.'], stack: 'Cloudflare Workers, D1', link: 'https://real-estate.nazarrahil0000.workers.dev/', linkLabel: 'Visit live', image: '/realestate.webp' },
       { title: 'Centronne', sub: 'ERP lead-to-cash', points: ['Lead, deal, estimation, quotation, sales order, then project scheduling and invoicing/payments.', 'Vendors, payables, expenses, quarterly and annual statements; Dockerized ERPNext + HRMS.'], stack: 'ERPNext, Frappe, Docker' },
     ],
   },
@@ -47,7 +49,7 @@ export const doors: Door[] = [
     blurb: 'LLM routing, hybrid retrieval and answers scored for hallucination.',
     skills: ['Gemini', 'Ollama / Mistral', 'ChromaDB', 'Neo4j', 'spaCy', 'Claude Code', 'Cursor', 'Antigravity'],
     projects: [
-      { title: 'FlowDesk AI', sub: 'Request routing', points: ['Ingests Telegram and WhatsApp messages and classifies them with Gemini via async BullMQ jobs.', 'Routes to a live admin dashboard with JWT access/refresh auth, audit trails and notes.'], stack: 'React, Node, Prisma, Gemini, Redis', link: 'https://flowdesk-ai-4h1.pages.dev/', linkLabel: 'Visit live', image: '/flowdesk.png', repo: 'https://github.com/Rahilralu/FlowDesk-AI' },
+      { title: 'FlowDesk AI', sub: 'Request routing', points: ['Ingests Telegram and WhatsApp messages and classifies them with Gemini via async BullMQ jobs.', 'Routes to a live admin dashboard with JWT access/refresh auth, audit trails and notes.'], stack: 'React, Node, Prisma, Gemini, Redis', link: 'https://flowdesk-ai-4h1.pages.dev/', linkLabel: 'Visit live', image: '/flowdesk.webp', repo: 'https://github.com/Rahilralu/FlowDesk-AI' },
       { title: 'Agentic Math Tutor', sub: 'Hackstreet hackathon', points: ['An agentic math tutor, built with the Hackstreet hackathon team.'], stack: 'AI agents', link: 'https://github.com/Hackstreet-hackathon/agentic-math-tutor', linkLabel: 'GitHub' },
       { title: 'Financial RAG', sub: 'Hackathon', points: ['Hybrid RAG fusing ChromaDB vector retrieval with a spaCy-built Neo4j knowledge graph.', 'Scores answers for hallucination and re-prompts until they clear a threshold; runs locally with Mistral via Ollama.'], stack: 'ChromaDB, Neo4j, Ollama' },
       { title: 'Echo', sub: 'Hackathon · VIBHAVA Summit', points: ['AI hearing-assist app; built the backend and audio streaming.', 'Showcased at VIBHAVA Summit, CUSAT.'], stack: 'Flutter, Express, WebSockets, LLM' },
@@ -58,6 +60,7 @@ export const doors: Door[] = [
     blurb: 'Figma wireframes to responsive layouts. Design shapes how I build usable frontends.',
     skills: ['Figma', 'Wireframes', 'Mockups', 'Responsive layouts'],
     projects: [
+      { title: 'ACES CUSAT', sub: 'Association website', points: ['Interface for the ACES CUSAT association site: events, achievements, materials, placements, newsletter and team pages.'], link: 'https://www.acescusat.tech/', linkLabel: 'Visit site', image: '/aces-site.webp' },
       { title: 'osci.osconnect.org', sub: 'PHICSIT InfoTech', points: ['Redesigned in Figma: wireframes, mockups and responsive layouts, with a team of 3 designers.'] },
       { title: 'nexfellow.com', sub: 'PHICSIT InfoTech', points: ['Redesigned in Figma alongside the OSCI redesign during a UI/UX internship (May – Jun 2025).'] },
     ],
@@ -116,10 +119,11 @@ export const repos: Repo[] = [
 export const langColor: Record<string, string> = { JavaScript: '#f1e05a', TypeScript: '#3178c6', Vue: '#41b883', Python: '#3572A5', Java: '#b07219', CSS: '#7e5bef', 'Jupyter Notebook': '#DA5B0B' }
 export const cats: ('All' | Cat)[] = ['All', 'Frontend', 'Backend', 'AI', 'Open source', 'Learning']
 
+const levelColour = { Easy: '#4fb99f', Medium: '#e5b04a', Hard: '#e0605a' } as const
 export const leetcode = {
   user: 'Rahil_ralu', url: 'https://leetcode.com/u/Rahil_ralu/', rank: '582,523',
-  solved: 277, total: 4109, acceptance: '66.21%', submissions: 589,
-  levels: [{ k: 'Easy', n: 201, of: 975, c: '#4fb99f' }, { k: 'Medium', n: 68, of: 2145, c: '#e5b04a' }, { k: 'Hard', n: 8, of: 989, c: '#e0605a' }],
+  solved: lc.solved, total: lc.total, acceptance: '66.21%', submissions: 589,
+  levels: (['Easy', 'Medium', 'Hard'] as const).map((k) => ({ k, n: lc.levels[k].n, of: lc.levels[k].of, c: levelColour[k] })),
   langs: [{ k: 'Java', n: 256 }, { k: 'MySQL', n: 20 }, { k: 'C++', n: 3 }],
   skills: [
     { lvl: 'Advanced', items: [['Divide and Conquer', 10], ['Dynamic Programming', 8], ['Backtracking', 3]] },
