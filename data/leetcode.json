@@ -1,9 +1,9 @@
 {
   "solved": 277,
-  "total": 4123,
+  "total": 4124,
   "levels": {
     "Easy": { "n": 201, "of": 978 },
     "Medium": { "n": 68, "of": 2152 },
-    "Hard": { "n": 8, "of": 993 }
+    "Hard": { "n": 8, "of": 994 }
   }
 }
